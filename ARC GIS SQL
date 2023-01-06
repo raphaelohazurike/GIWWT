@@ -1,0 +1,61 @@
+CREATE DATABASE `AIS_GIWW`;
+USE `AIS_GIWW`;
+CREATE TABLE `segments` (
+  `id_segments` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `polyline` json DEFAULT NULL,
+  `polygon` json DEFAULT NULL,
+  PRIMARY KEY (`id_segments`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `vessel_profile` (
+  `id_vessel_profile` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `mmsi` int(11) NOT NULL,
+  `imo` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
+  `width` float NOT NULL,
+  `length` float NOT NULL,
+  `draft` float NOT NULL,
+  `callsign` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id_vessel_profile`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `vessel_status` (
+  `id_vessel_status` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_vessel_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `vessel_type` (
+  `id_vessel_type` int(11) NOT NULL,
+  `group` varchar(45) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`id_vessel_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `trips` (
+  `id_trips` int(11) NOT NULL,
+  `id_vessel_profile` int(11) NOT NULL,
+  `id_segments` int(11) NOT NULL,
+  `speed_over_ground` float DEFAULT NULL,
+  `courseover_ground` float DEFAULT NULL,
+  `vessel_heading` float DEFAULT NULL,
+  `latitude` geometry DEFAULT NULL,
+  `longitude` geometry DEFAULT NULL,
+  `timestamp` datetime DEFAULT NULL,
+  `delta_time` float DEFAULT NULL,
+  `delta_length` float DEFAULT NULL,
+  `tour_number` int(11) DEFAULT NULL,
+  `trip_number` int(11) DEFAULT NULL,
+  `direction` int(11) DEFAULT NULL,
+  `id_vessel_status` int(11) NOT NULL,
+  PRIMARY KEY (`id_trips`),
+  KEY `fk_vessel_idx` (`id_vessel_profile`),
+  KEY `fk_idx` (`id_vessel_profile`,`id_vessel_status`,`id_segments`),
+  KEY `fk_segments` (`id_segments`),
+  KEY `fk_status` (`id_vessel_status`),
+  CONSTRAINT `fk_segments` FOREIGN KEY (`id_segments`) REFERENCES `segments` (`id_segments`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_status` FOREIGN KEY (`id_vessel_status`) REFERENCES `vessel_status` (`id_vessel_status`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_vessel` FOREIGN KEY (`id_vessel_profile`) REFERENCES `vessel_profile` (`id_vessel_profile`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
